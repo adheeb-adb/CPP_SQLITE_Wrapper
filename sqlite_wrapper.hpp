@@ -1,7 +1,6 @@
 #ifndef _SQLITE_WRAPPER_
 #define _SQLITE_WRAPPER_
 
-
 #include <iostream>
 #include <map>
 #include <stdio.h>
@@ -65,9 +64,9 @@ namespace sqlite_wrapper
 
         int add_row(const std::vector<std::string> &row_values)
         {
-            if(column_name_type_map.size() == 0 || row_values.size() != column_name_type_map.size())
+            if (column_name_type_map.size() == 0 || row_values.size() != column_name_type_map.size())
                 return -1;
-            
+
             value_rows.insert(value_rows.end(), row_values);
 
             return 0;
