@@ -36,8 +36,6 @@ int select_values(sqlite3 *db, char *zErrMsg, std::string_view table_name, void 
 int main(int argc, char *argv[])
 {
    sqlite3 *db;
-   char *zErrMsg = 0;
-   int rc;
 
    // Open connection to the DB
    if (sqlite_wrapper::open_db("test.db", &db) == -1)
@@ -93,18 +91,18 @@ int main(int argc, char *argv[])
 
    sqlite_wrapper::table_value_info table_value_info(column_name_type_map);
 
-   table_value_info.add_row(std::vector<std::string> {"5", "James", "31", "London", "23000"});
-   table_value_info.add_row(std::vector<std::string> {"6", "Jeremy", "33", "Westhampshire", "25000"});
-   table_value_info.add_row(std::vector<std::string> {"7", "RIchard", "28", "Wales", "23000"});
+   table_value_info.add_row(std::vector<std::string>{"5", "James", "31", "London", "23000"});
+   table_value_info.add_row(std::vector<std::string>{"6", "Jeremy", "33", "Westhampshire", "25000"});
+   table_value_info.add_row(std::vector<std::string>{"7", "RIchard", "28", "Wales", "23000"});
 
-    if (sqlite_wrapper::insert_values(db, table_name, table_value_info) == -1)
+   if (sqlite_wrapper::insert_values(db, table_name, table_value_info) == -1)
    {
       sqlite3_close(db);
       return -1;
    }
    else
       std::cout << "Records added successfully\n";
-   
+
    /*Select values*/
    std::vector<std::map<std::string, std::string>> selected_value_map_list;
 

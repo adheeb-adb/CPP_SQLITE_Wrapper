@@ -78,8 +78,8 @@ namespace sqlite_wrapper
         /* Execute SQL statement */
         return exec_sql(db, sql);
     }
-    
-   /**
+
+    /**
      * Insert values to a table.
      * @param db Pointer to the db.
      * @param table_name Table name to be populated.
@@ -98,11 +98,11 @@ namespace sqlite_wrapper
             int column_index = 0;
             for (const auto &column : value_info.column_name_type_map)
             {
-                 //construct column names string during the first iteration.
-                if (itr == value_info.value_rows.begin()) 
+                //construct column names string during the first iteration.
+                if (itr == value_info.value_rows.begin())
                 {
                     column_names_string.append(column.first);
-                    if(column_index != value_info.column_name_type_map.size() - 1)
+                    if (column_index != value_info.column_name_type_map.size() - 1)
                         column_names_string.append(",");
                 }
 
@@ -116,7 +116,7 @@ namespace sqlite_wrapper
 
                 if (column_index != value_info.column_name_type_map.size() - 1)
                     values_string.append(",");
-                
+
                 ++column_index;
             }
             values_string.append(")");
