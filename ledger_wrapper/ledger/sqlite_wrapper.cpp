@@ -122,9 +122,10 @@ namespace ledger::sqlite_wrapper
      * @param value_strings Vector of comma seperated values (wrap in single quotes for TEXT type) (eg: ["r1val1,'r1val2',...", "r2val1,'r2val2',..."]).
      * @returns returns 0 on success, or -1 on error.
     */
-    int insert_value(sqlite3 *db, std::string_view table_name, std::string_view column_names_string, std::string_view value_strings)
+    int insert_value(sqlite3 *db, std::string_view table_name, std::string_view column_names_string, std::string_view value_string)
     {
         std::string sql;
+        sql.reserve(INSERT_INTO.size() + table_name.size() + column_names_string.size() + VALUES.size() + value_string.size() + 5);
 
         sql.append(INSERT_INTO);
         sql.append(table_name);
@@ -133,13 +134,18 @@ namespace ledger::sqlite_wrapper
         sql.append(")");
         sql.append(" " + VALUES);
         sql.append("(");
-        sql.append(value_strings);
+        sql.append(value_string);
         sql.append(")");
 
         /* Execute SQL statement */
         return exec_sql(db, sql);
     }
 
+    /**
+     * Creates a table for ledger records.
+     * @param db Pointer to the db.
+     * @returns returns 0 on success, or -1 on error.
+    */
     int create_ledger_table(sqlite3 *db)
     {
         std::vector<sqlite_wrapper::table_column_info> column_info{
@@ -160,24 +166,25 @@ namespace ledger::sqlite_wrapper
         return 0;
     }
 
-    std::string add_quote(std::string value)
-    {
-        return "'" + value + "'";
-    }
-
+    /**
+     * Inserts a ledger record.
+     * @param db Pointer to the db.
+     * @param ledger Ledger struct to beinserted.
+     * @returns returns 0 on success, or -1 on error.
+    */
     int insert_ledger_row(sqlite3 *db, const ledger &ledger)
     {
         std::string value_string;
         value_string.append(std::to_string(ledger.seq_no) + ",");
         value_string.append(std::to_string(ledger.time) + ",");
-        value_string.append(add_quote(ledger.ledger_hash) + ",");
-        value_string.append(add_quote(ledger.prev_ledger_hash) + ",");
-        value_string.append(add_quote(ledger.data_hash) + ",");
-        value_string.append(add_quote(ledger.state_hash) + ",");
-        value_string.append(add_quote(ledger.patch_hash) + ",");
-        value_string.append(add_quote(ledger.user_hash) + ",");
-        value_string.append(add_quote(ledger.input_hash) + ",");
-        value_string.append(add_quote(ledger.output_hash));
+        value_string.append(wrap_in_single_quote(ledger.ledger_hash) + ",");
+        value_string.append(wrap_in_single_quote(ledger.prev_ledger_hash) + ",");
+        value_string.append(wrap_in_single_quote(ledger.data_hash) + ",");
+        value_string.append(wrap_in_single_quote(ledger.state_hash) + ",");
+        value_string.append(wrap_in_single_quote(ledger.patch_hash) + ",");
+        value_string.append(wrap_in_single_quote(ledger.user_hash) + ",");
+        value_string.append(wrap_in_single_quote(ledger.input_hash) + ",");
+        value_string.append(wrap_in_single_quote(ledger.output_hash));
 
         // if (sqlite_wrapper::insert_values(db, ledger_table, ledger_columns, std::vector<std::string>{value_string}) == -1)
         //     return -1;
@@ -185,5 +192,22 @@ namespace ledger::sqlite_wrapper
             return -1;
         
         return 0;
+    }
+
+    /**
+     * Wraps a given string with quoted.
+     * @param value String value to be quoted.
+     * @returns returns quoted string.
+    */
+    std::string wrap_in_single_quote(std::string_view value)
+    {
+        std::string s;
+        s.reserve(value.size() + 2);
+
+        s.append("'");
+        s.append(value);
+        s.append("'");
+
+        return s;
     }
 } // namespace ledger::sqlite_wrapper
